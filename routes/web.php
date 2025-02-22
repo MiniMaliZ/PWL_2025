@@ -26,6 +26,8 @@ Route::get('/about', [AboutController::class, 'about']);
 
 Route::get('/articles/{id}', [ArticleController::class, 'articles']);
 
+Route::get('/greeting', [WelcomeController::class, 'greeting']);
+
 Route::resource('photos', PhotoController::class)->only([
     'index',
     'show'
