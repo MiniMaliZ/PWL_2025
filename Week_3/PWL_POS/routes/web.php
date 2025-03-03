@@ -3,11 +3,11 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\UserController;
 use App\Http\Controllers\SalesController;
 
 use App\Http\Controllers\LevelController;
 use App\Http\Controllers\KategoriController;
+use App\Http\Controllers\UserController;
 
 Route::get('/', [HomeController::class, 'index']);
 
@@ -18,9 +18,8 @@ Route::prefix('category')->group(function () {
     Route::get('/baby-kid', [ProductControlLer :: class, 'babykid' ]);
 });
 
-Route::get('/user/{id}/name/{name}', [UserController::class, 'user']);
-
 Route::get('/sales', [SalesController::class, 'sales']);
 
 Route::get('/level', [LevelController::class, 'index']);
 Route::get('/kategori', [KategoriController::class, 'index']);
+Route::get('/user', [UserController::class, 'index']);
