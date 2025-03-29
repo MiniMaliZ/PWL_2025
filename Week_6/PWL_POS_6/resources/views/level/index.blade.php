@@ -44,7 +44,7 @@
         
         var dataLevel;
         $(document).ready(function() {
-            var dataLevel = $('#table_level').DataTable({
+            dataLevel = $('#table_level').DataTable({
                 processing: true,
                 serverSide: true, // Jika ingin menggunakan server-side processing
                 ajax: {
