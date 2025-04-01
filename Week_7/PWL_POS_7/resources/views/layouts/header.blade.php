@@ -47,7 +47,7 @@
                 <a href="#" class="dropdown-item">
                     <!-- Message Start -->
                     <div class="media">
-                        <img src="../../dist/img/user1-128x128.jpg" alt="User Avatar"
+                        <img src="adminlte/dist/img/user1-128x128.jpg" alt="User Avatar"
                             class="img-size-50 mr-3 img-circle">
                         <div class="media-body">
                             <h3 class="dropdown-item-title">
@@ -64,7 +64,7 @@
                 <a href="#" class="dropdown-item">
                     <!-- Message Start -->
                     <div class="media">
-                        <img src="../../dist/img/user8-128x128.jpg" alt="User Avatar"
+                        <img src="adminlte/dist/img/user8-128x128.jpg" alt="User Avatar"
                             class="img-size-50 img-circle mr-3">
                         <div class="media-body">
                             <h3 class="dropdown-item-title">
@@ -81,7 +81,7 @@
                 <a href="#" class="dropdown-item">
                     <!-- Message Start -->
                     <div class="media">
-                        <img src="../../dist/img/user3-128x128.jpg" alt="User Avatar"
+                        <img src="adminlte/dist/img/user3-128x128.jpg" alt="User Avatar"
                             class="img-size-50 img-circle mr-3">
                         <div class="media-body">
                             <h3 class="dropdown-item-title">
@@ -134,6 +134,12 @@
             <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
                 <i class="fas fa-th-large"></i>
             </a>
+        </li>
+        <li class="nav-item">
+            <form id="logout-form" action="{{ url('logout') }}" method="GET">
+                @csrf
+                <button type="submit" class="btn btn-danger btn-block">Logout</button>
+            </form>
         </li>
     </ul>
 </nav>
