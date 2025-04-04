@@ -5,6 +5,7 @@
         <div class="card-header">
             <h3 class="card-title">{{ $page->title }}</h3>
             <div class="card-tools">
+                <button onclick="modalAction('{{ url('/level/import') }}')" class="btn btn-info">Import Level</button>
                 <button onclick="modalAction('{{ url('level/create_ajax') }}')"
                     class="btn btn-sm btn-success mt-1">Tambah</button>
             </div>
@@ -42,9 +43,9 @@
             });
         }
         
-        var dataLevel;
+        var tableLevel;
         $(document).ready(function() {
-            dataLevel = $('#table_level').DataTable({
+            tableLevel = $('#table_level').DataTable({
                 processing: true,
                 serverSide: true, // Jika ingin menggunakan server-side processing
                 ajax: {

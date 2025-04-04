@@ -5,6 +5,7 @@
         <div class="card-header">
             <h3 class="card-title">{{ $page->title }}</h3>
             <div class="card-tools">
+                <button onclick="modalAction('{{ url('/supplier/import') }}')" class="btn btn-info">Import Supplier</button>
                 <button onclick="modalAction('{{ url('/supplier/create_ajax') }}')"
                     class="btn btn-sm btn-success mt-1">Tambah</button>
             </div>
@@ -44,9 +45,9 @@
             });
         }
 
-        var dataSupplier;
+        var tableSupplier;
         $(document).ready(function() {
-            dataSuppllier = $('#table_supplier').DataTable({
+            tableSupplier = $('#table_supplier').DataTable({
                 processing: true,
                 serverSide: true, // Jika ingin menggunakan server-side processing
                 ajax: {
