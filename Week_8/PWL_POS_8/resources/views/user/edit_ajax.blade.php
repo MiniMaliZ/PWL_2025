@@ -3,7 +3,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Kesalahan</h5>
-                <button type="button" class="close" data-dismiss="modal" aria- label="Close"><span
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                         aria-hidden="true">&times;</span></button>
             </div>
             <div class="modal-body">
@@ -15,7 +15,8 @@
         </div>
     </div>
 @else
-    <form action="{{ url('/user/' . $user->user_id . '/update_ajax') }}" method="POST" id="form-edit">
+    <form action="{{ url('/user/' . $user->user_id . '/update_ajax') }}" method="POST" id="form-edit"
+        enctype="multipart/form-data">
         @csrf @method('PUT')
         <div id="modal-master" class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
@@ -51,10 +52,21 @@
                     <div class="form-group">
                         <label>Password</label>
                         <input value="" type="password" name="password" id="password" class="form-control">
-                        <small class="form-text text-muted">Abaikan jika tidak ingin ubah
-                            password</small>
+                        <small class="form-text text-muted">Abaikan jika tidak ingin ubah password</small>
                         <small id="error-password" class="error-text form-text text-danger"></small>
                     </div>
+                    <div class="form-group">
+                        <label>Foto Profil (opsional)</label>
+                        <input type="file" name="foto" id="foto" class="form-control" accept="image/*">
+                        <small class="form-text text-muted">Kosongkan jika tidak ingin mengganti foto</small>
+                        <small id="error-foto" class="error-text form-text text-danger"></small>
+                    </div>
+                    @if ($user->foto)
+                        <div class="form-group">
+                            <label>Foto Saat Ini:</label><br>
+                            <img src="{{ asset('/storage/uploads/foto/' . $user->foto) }}" width="100" class="img-thumbnail">
+                        </div>
+                    @endif
                 </div>
                 <div class="modal-footer">
                     <button type="button" data-dismiss="modal" class="btn btn-warning">Batal</button>
@@ -65,6 +77,11 @@
     </form>
     <script>
         $(document).ready(function() {
+            $.validator.addMethod('filesize', function(value, element, param) {
+                if (element.files.length == 0) return true;
+                return this.optional(element) || (element.files[0].size <= param);
+            }, 'Ukuran file maksimal 5 MB');
+
             $("#form-edit").validate({
                 rules: {
                     level_id: {
@@ -84,13 +101,20 @@
                     password: {
                         minlength: 6,
                         maxlength: 20
+                    },
+                    foto: {
+                        required: false,
+                        // extension: "jpg|jpeg|png",
+                        // filesize: 5000000
                     }
                 },
                 submitHandler: function(form) {
                     $.ajax({
                         url: form.action,
                         type: form.method,
-                        data: $(form).serialize(),
+                        data: new FormData(form),
+                        processData: false,
+                        contentType: false,
                         success: function(response) {
                             if (response.status) {
                                 $('#myModal').modal('hide');
@@ -99,7 +123,7 @@
                                     title: 'Berhasil',
                                     text: response.message
                                 });
-                                tableUser.ajax.reload();
+                                TableUser.ajax.reload();
                             } else {
                                 $('.error-text').text('');
                                 $.each(response.msgField, function(prefix, val) {

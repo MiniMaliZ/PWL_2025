@@ -6,9 +6,12 @@
             <h3 class="card-title">{{ $page->title }}</h3>
             <div class="card-tools">
                 <button onclick="modalAction('{{ url('/user/import') }}')" class="btn btn-info">Import User</button>
-                <a href="{{ url('/user/export_excel') }}" class="btn btn-primary"><i class="fa fa-file- excel"></i> Export User</a>
-                <a href="{{ url('/user/export_pdf') }}" class="btn btn-warning"><i class="fa fa-file- pdf"></i> Export User</a>
-                <button onclick="modalAction('{{ url('user/create_ajax') }}')" class="btn btn-sm btn-success mt-1">Tambah</button>
+                <a href="{{ url('/user/export_excel') }}" class="btn btn-primary"><i class="fa fa-file- excel"></i> Export
+                    User</a>
+                <a href="{{ url('/user/export_pdf') }}" class="btn btn-warning"><i class="fa fa-file- pdf"></i> Export
+                    User</a>
+                <button onclick="modalAction('{{ url('user/create_ajax') }}')"
+                    class="btn btn-sm btn-success mt-1">Tambah</button>
             </div>
         </div>
         <div class="card-body">
@@ -41,6 +44,7 @@
                         <th>Username</th>
                         <th>Nama</th>
                         <th>Level Pengguna</th>
+                        <th>Foto</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -93,6 +97,17 @@
                     orderable: false,
                     searchable: false
                 }, {
+                    data: "foto",
+                    className: "text-center",
+                    orderable: false,
+                    searchable: false,
+                    render: function(data) {
+                        if (data) {
+                            return `<img src="/storage/foto/${data}" width="100" height="100" class="rounded-circle"/>`;
+                        }
+                        return `<span class="text-muted"></span>`;
+                    }
+                }, {
                     data: "aksi",
                     className: "",
                     orderable: false,
@@ -100,7 +115,7 @@
                 }]
             });
             $('#level_id').on('change', function() {
-                tableUser.ajax.reload();
+                TableUser.ajax.reload();
             });
         });
     </script>

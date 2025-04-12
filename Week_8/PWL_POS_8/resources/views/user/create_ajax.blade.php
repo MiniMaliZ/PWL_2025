@@ -1,4 +1,4 @@
-<form action="{{ url('/user/ajax') }}" method="POST" id="form-tambah"> @csrf
+<form action="{{ url('/user/ajax') }}" method="POST" id="form-tambah" enctype="multipart/form-data"> @csrf
     <div id="modal-master" class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -29,9 +29,13 @@
                 </div>
                 <div class="form-group">
                     <label>Password</label>
-                    <input value="" type="password" name="password" id="password" class="form-control"
-                        required>
+                    <input value="" type="password" name="password" id="password" class="form-control" required>
                     <small id="error-password" class="error-text form-text text-danger"></small>
+                </div>
+                <div class="form-group">
+                    <label>Foto Profil</label>
+                    <input type="file" name="foto" id="foto" class="form-control" accept="image/*">
+                    <small id="error-foto" class="error-text form-text text-danger"></small>
                 </div>
             </div>
             <div class="modal-footer">
@@ -41,8 +45,14 @@
         </div>
     </div>
 </form>
+
 <script>
     $(document).ready(function() {
+        $.validator.addMethod('filesize', function(value, element, param) {
+            if (element.files.length === 0) return true;
+            return this.optional(element) || (element.files[0].size <= param);
+        }, 'Ukuran file maksimal 5 MB');
+
         $("#form-tambah").validate({
             rules: {
                 level_id: {
@@ -63,13 +73,20 @@
                     required: true,
                     minlength: 6,
                     maxlength: 20
+                },
+                foto: {
+                    required: false,
+                    extension: "jpg|jpeg|png",
+                    filesize: 5000000 // maksimal 5MB
                 }
             },
             submitHandler: function(form) {
                 $.ajax({
                     url: form.action,
                     type: form.method,
-                    data: $(form).serialize(),
+                    data: new FormData(form),
+                    processData: false,
+                    contentType: false,
                     success: function(response) {
                         if (response.status) {
                             $('#myModal').modal('hide');
@@ -78,7 +95,7 @@
                                 title: 'Berhasil',
                                 text: response.message
                             });
-                            tableUser.ajax.reload();
+                            TableUser.ajax.reload();
                         } else {
                             $('.error-text').text('');
                             $.each(response.msgField, function(prefix, val) {
@@ -99,10 +116,10 @@
                 error.addClass('invalid-feedback');
                 element.closest('.form-group').append(error);
             },
-            highlight: function(element, errorClass, validClass) {
+            highlight: function(element) {
                 $(element).addClass('is-invalid');
             },
-            unhighlight: function(element, errorClass, validClass) {
+            unhighlight: function(element) {
                 $(element).removeClass('is-invalid');
             }
         });

@@ -6,6 +6,7 @@ use App\Models\LevelModel;
 use Illuminate\Http\Request;
 use App\Models\UserModel;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Yajra\DataTables\Facades\DataTables;
@@ -34,7 +35,7 @@ class UserController extends Controller
     // Ambil data user dalam bentuk json untuk datatables 
     public function list(Request $request)
     {
-        $users = UserModel::select('user_id', 'username', 'nama', 'level_id')
+        $users = UserModel::select('user_id', 'username', 'nama', 'level_id', 'foto')
             ->with('level');
 
         // Filter data user berdasarkan level_id
@@ -75,7 +76,8 @@ class UserController extends Controller
                 'level_id' => 'required|integer',
                 'username' => 'required|string|min:3|unique:m_user,username',
                 'nama' => 'required|string|max:100',
-                'password' => 'required|min:6'
+                'password' => 'required|min:6',
+                'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:5000'
             ];
 
             $validator = Validator::make($request->all(), $rules);
@@ -88,7 +90,26 @@ class UserController extends Controller
                 ]);
             }
 
-            UserModel::create($request->all());
+            $fotoName = null;
+
+            if ($request->hasFile('foto')) {
+
+                $file = $request->file('foto');
+                $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $file->storeAs('public/foto', $filename);
+                unset($request['foto']);
+                $fotoName = $filename;
+            }
+
+            // Simpan data user
+            UserModel::create([
+                'level_id' => $request->level_id,
+                'username' => $request->username,
+                'nama' => $request->nama,
+                'password' => bcrypt($request->password),
+                'foto' => $fotoName,
+            ]);
+
             return response()->json([
                 'status' => true,
                 'message' => 'Data user berhasil disimpan'
@@ -131,36 +152,58 @@ class UserController extends Controller
             $rules = [
                 'level_id' => 'required|integer',
                 'username' => 'required|max:20|unique:m_user,username,' . $id . ',user_id',
-                'nama'    => 'required|max:100',
-                'password' => 'nullable|min:6|max:20'
+                'nama'     => 'required|max:100',
+                'password' => 'nullable|min:6|max:20',
+                'foto'     => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // Validasi ukuran file menjadi 2MB
             ];
             // use Illuminate\Support\Facades\Validator;
             $validator = Validator::make($request->all(), $rules);
 
             if ($validator->fails()) {
                 return response()->json([
-                    'status'    => false,    // respon json, true: berhasil, false: gagal 'message' => 'Validasi gagal.',
-                    'msgField' => $validator->errors() // menunjukkan field mana yang error
+                    'status'   => false,    // respon json, true: berhasil, false: gagal 'message' => 'Validasi gagal.',
+                    'msgField' => $validator->errors(), // menunjukkan field mana yang error
                 ]);
             }
 
-            $check = UserModel::find($id);
-            if ($check) {
-                if (!$request->filled('password')) { // jika password tidak diisi, maka hapus dari
-                    $request->request->remove('password');
+            $user = UserModel::find($id);
+            if (!$user) {
+                return response()->json([
+                    'status'  => false,
+                    'message' => 'Data tidak ditemukan',
+                ]);
+            }
+
+            $updateData = $request->except(['_token', '_method', 'foto']);
+
+            // Hapus field password kalau kosong
+            if (!$request->filled('password')) {
+                unset($updateData['password']);
+            } else {
+                // Enkripsi password jika ada
+                $updateData['password'] = bcrypt($request->password);
+            }
+            // dd($request->all());
+
+            // Proses upload foto jika ada
+            if ($request->hasFile('foto')) {
+                // Hapus foto lama jika ada
+                if ($user->foto && Storage::exists('public/foto/' . $user->foto)) {
+                    Storage::delete('public/foto/' . $user->foto);
                 }
 
-                $check->update($request->all());
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Data berhasil diupdate'
-                ]);
-            } else {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Data tidak ditemukan'
-                ]);
+                $file = $request->file('foto');
+                $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $file->storeAs('public/foto', $filename);
+                $updateData['foto'] = $filename;
             }
+
+            UserModel::where('user_id', $id)->update($updateData);
+
+            return response()->json([
+                'status'  => true,
+                'message' => 'Data berhasil diupdate',
+            ]);
         }
         return redirect('/');
     }
