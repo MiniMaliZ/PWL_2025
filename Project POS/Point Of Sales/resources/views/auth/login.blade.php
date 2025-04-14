@@ -16,7 +16,7 @@
     <!-- SweetAlert2 -->
     <link rel="stylesheet" href="{{ asset('adminlte/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css') }}">
     <!-- Theme style -->
-    <link rel="stylesheet" href="{{ asset('adminlte/dist/css/adminlte.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('adminlte/dist/css/modified_adminlte_darkblue.css') }}">
 </head>
 
 <body class="hold-transition login-page">

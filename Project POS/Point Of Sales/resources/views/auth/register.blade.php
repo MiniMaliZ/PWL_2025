@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="{{ asset('adminlte/plugins/fontawesome-free/css/all.min.css') }}">
     <link rel="stylesheet" href="{{ asset('adminlte/plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('adminlte/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('adminlte/dist/css/adminlte.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('adminlte/dist/css/modified_adminlte_darkblue.css') }}">
 </head>
 
 <body class="hold-transition register-page">
