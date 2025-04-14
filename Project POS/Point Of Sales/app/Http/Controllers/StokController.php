@@ -299,7 +299,7 @@ class StokController extends Controller
 
     public function export_pdf()
     {
-        $stok = StokModel::select('barang_id', 'user_id', 'stok_tanggal', 'stok_jumlah')
+        $stok = StokModel::select('barang_id', 'stok_tanggal', 'stok_jumlah', 'user_id')
             ->orderBy('stok_tanggal', 'desc')
             ->with(['barang', 'user'])
             ->get();
