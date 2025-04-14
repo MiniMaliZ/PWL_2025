@@ -15,6 +15,13 @@ class StokModel extends Model
 
     protected $guarded = [];
 
+    protected $fillable = [
+        'barang_id',
+        'stok_tanggal',
+        'stok_jumlah',
+        'user_id'
+    ];
+
     public function barang(): BelongsTo
     {
         return $this->belongsTo(BarangModel::class, 'barang_id', 'barang_id');

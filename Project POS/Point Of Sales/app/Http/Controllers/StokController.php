@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Yajra\DataTables\Facades\DataTables;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Log;
 
 class StokController extends Controller
 {
@@ -184,27 +185,55 @@ class StokController extends Controller
             $data = $sheet->toArray(null, false, true, true);
 
             $insert = [];
+            $errors = [];
             if (count($data) > 1) {
                 foreach ($data as $baris => $value) {
-                    if ($baris > 1) {
-                        $insert[] = [
-                            'barang_id' => $value['A'],
-                            'user_id' => auth()->user()->user_id,
-                            'stok_tanggal' => $value['B'],
-                            'stok_jumlah' => $value['C'],
-                            'created_at' => now(),
-                        ];
+                    if ($baris > 1) { // baris ke 1 adalah header, maka lewati
+                        try {
+                            $insert[] = [
+                                'barang_id' => $value['A'],
+                                'stok_tanggal' => $value['B'],
+                                'stok_jumlah' => $value['C'],
+                                'user_id' => $value['D'],
+                                'created_at' => now(),
+                            ];
+                        } catch (\Exception $e) {
+                            $errors[] = "Error on row {$baris}: " . $e->getMessage();
+                        }
                     }
                 }
 
-                if (count($insert) > 0) {
-                    StokModel::insertOrIgnore($insert);
+                if (!empty($errors)) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Terdapat kesalahan data',
+                        'errors' => $errors
+                    ]);
                 }
 
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Data stok berhasil diimport'
-                ]);
+                if (count($insert) > 0) {
+                    try {
+                        // Insert records one by one to identify problematic data
+                        foreach ($insert as $record) {
+                            StokModel::create($record);
+                        }
+
+                        return response()->json([
+                            'status' => true,
+                            'message' => 'Data stok berhasil diimport (' . count($insert) . ' data)'
+                        ]);
+                    } catch (\Exception $e) {
+                        return response()->json([
+                            'status' => false,
+                            'message' => 'Error saat menyimpan: ' . $e->getMessage()
+                        ]);
+                    }
+                } else {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Tidak ada data yang diimport'
+                    ]);
+                }
             } else {
                 return response()->json([
                     'status' => false,
