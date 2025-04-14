@@ -18,7 +18,7 @@
 <!-- SweetAlert2 -->
 <link rel="stylesheet" href="{{ asset('adminlte/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css') }}">
 <!--Theme style -->
-<link rel="stylesheet" href="{{ asset('adminlte/dist/css/adminlte.min.css') }}">
+<link rel="stylesheet" href="{{ asset('adminlte/dist/css/modified_adminlte_darkblue.css') }}">
 
 @stack('css') <!-- Digunakan untuk memanggil custom css dari perintah push('css') pada masing-masing view -->
 </head>
@@ -30,7 +30,7 @@
   <!-- /.navbar -->
 
   <!-- Main Sidebar Container -->
-  <aside class="main-sidebar sidebar-dark-primary elevation-4">
+  <aside class="main-sidebar sidebar-dark-blue elevation-4">
     <!-- Brand Logo -->
     <a href="{{ url('/') }}" class="brand-link">
       <img src="{{ asset('adminlte/dist/img/AdminLTELogo.png') }}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
