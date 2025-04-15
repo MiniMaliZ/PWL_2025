@@ -48,7 +48,7 @@
     @include('layouts.breadcrumb')
 
     <!-- Main content -->
-    <section class="content">
+    <section class="content dark-mode">
         @yield('content')
     </section>
     <!-- /.content -->

@@ -46,6 +46,9 @@ class StokController extends Controller
                 $btn .= '<button onclick="modalAction(\'' . url('/stok/' . $stok->stok_id . '/delete_ajax') . '\')" class="btn btn-danger btn-sm">Hapus</button> ';
                 return $btn;
             })
+            ->addColumn('stok_tanggal', function ($stok) {
+                return date('d-m-Y', strtotime($stok->stok_tanggal));
+            })
             ->rawColumns(['aksi'])
             ->make(true);
     }
@@ -73,6 +76,11 @@ class StokController extends Controller
                     'msgField' => $validator->errors()
                 ]);
             }
+
+            $barang = BarangModel::find($request->barang_id);
+            $barang->update([
+                'stok' => $barang->stok + $request->stok_jumlah
+            ]);
 
             // Tambahkan user_id dari auth
             $data = $request->all();
@@ -114,6 +122,10 @@ class StokController extends Controller
 
             $check = StokModel::find($id);
             if ($check) {
+                $barang = BarangModel::find($request->barang_id);
+                $barang->update([
+                    'stok' => $barang->stok + $check->stok_jumlah - $request->stok_jumlah
+                ]);
                 $check->update($request->all());
                 return response()->json([
                     'status' => true,
@@ -140,6 +152,10 @@ class StokController extends Controller
         if ($request->ajax() || $request->wantsJson()) {
             $stok = StokModel::find($id);
             if ($stok) {
+                $barang = BarangModel::find($stok->barang_id);
+                $barang->update([
+                    'stok' => $barang->stok - $stok->stok_jumlah
+                ]);
                 $stok->delete();
                 return response()->json([
                     'status' => true,
