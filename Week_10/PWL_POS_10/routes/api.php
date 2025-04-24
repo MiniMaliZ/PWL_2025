@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/register-api', App\Http\Controllers\Api\RegisterController::class)->name('register-api');
 Route::post('/login-api', App\Http\Controllers\Api\LoginController::class)->name('login-api');
+Route::post('/logout-api', App\Http\Controllers\Api\LogoutController::class)->name('logout-api');
+
 Route::middleware('auth:api')->get('/users', function (Request $request) {
     return $request->user();
 });
