@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 use App\Models\BarangModel;
 use App\Http\Controllers\Controller;
-
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 
 class BarangController extends Controller
@@ -15,13 +15,44 @@ class BarangController extends Controller
 
     public function store(Request $request)
     {
-        $barang = BarangModel::create($request->all());
-        return response()->json($barang, 201);
+        // Validate request including image
+        $validator = Validator::make($request->all(), [
+            'kategori_id' => 'required',
+            'barang_kode' => 'required',
+            'barang_nama' => 'required',
+            'harga_beli' => 'required|numeric',
+            'harga_jual' => 'required|numeric',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imageName = $image->hashName();
+            $image->storeAs('public/barang', $imageName);
+            
+            // Create barang with image
+            $data = $request->all();
+            $data['image'] = $imageName;
+            
+            $barang = BarangModel::create($data);
+            return response()->json($barang, 201);
+        }
+
+        return response()->json(['error' => 'Failed to upload image'], 400);
     }
 
-    public function show(BarangModel $barang)
+    public function show($id)
     {
-        return BarangModel::find($barang);
+        $barang = BarangModel::find($id);
+        if (!$barang) {
+            return response()->json(['message' => 'Barang not found'], 404);
+        }
+        return response()->json($barang);
     }
 
     public function update(Request $request, BarangModel $barang)
